@@ -1,0 +1,49 @@
+/***********My Approach **************************/
+//T.C =>O(n*k)
+//S.C =>O(n)
+// class Solution {
+// public:
+//     long long pickGifts(vector<int>& gifts, int k) {
+//         long n = gifts.size();
+//         long long sum = 0;
+//         long  max_gifts, max_index;
+//         for(int i=0;i<k;++i){
+//             auto maxIt = max_element(gifts.begin(),gifts.end());
+//             max_gifts = *maxIt;
+//             max_index = distance(gifts.begin(), maxIt);
+//             gifts[max_index] = floor(sqrt(max_gifts));
+//         }
+//         for(int i=0;i<n;++i){
+//             sum += gifts[i];
+//         }
+//         return sum;
+
+//     }
+// };
+
+/**********Optimal Approach***************/
+//Tc=>O(n+k(logn))
+//Sc=>O(n)
+class Solution{
+    public:
+        long long pickGifts(vector<int>& gifts, int k){
+            //Heapify - O(n)
+            priority_queue<int> pq(begin(gifts),end(gifts)); //max-heap priority_queue<int,vector<int>,greater<int>> pq;
+            long long sum = 0;
+            for(int &gift: gifts){ //O(n)
+                sum += gift;
+            }
+            while(k--){ //O(k)
+                int maxElement = pq.top();//O(1)
+                pq.pop();//O(log(n))
+
+                int remainingElement = sqrt(maxElement);
+                sum -= (maxElement - remainingElement);
+                pq.push(remainingElement);//O(log(n))
+
+            }
+            return sum;
+
+        }
+};
+
