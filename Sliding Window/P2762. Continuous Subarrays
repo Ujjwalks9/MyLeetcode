@@ -1,0 +1,171 @@
+/******************** MY APPROACH *********************************/
+/*
+class Solution {
+public:
+    long long continuousSubarrays(vector<int>& nums) {
+        int n = nums.size();
+        int i = 0, j = 0;
+        long long count = 0;
+        bool status;
+
+        while (j < n) {
+            status = true;
+            for (int k = i; k <= j; ++k) {
+                for (int l = i; l <= j; ++l) {
+                    if (k != l) {
+                        int diff = abs(nums[k] - nums[l]);
+                        if (diff < 0 || diff > 2) {
+                            status = false;
+                            break;
+                        }
+                    }
+                }
+                if (!status) break;
+            }
+            if (status) {
+                count += (j-i+1);
+                j++;
+            } else {
+                i++;
+                if (i>j) j = i;
+            }
+        }
+        return count;
+    }
+}; 
+*/
+//Time complexity = O(n^3) //NOT ANSWER SATISFYING
+//Reason => we are checking each pair individually to get the differnce idea
+//Trick => check the differnce between largest and smallest in the subarray if it exceeds then it opposes the condition
+
+///***********************APPROACH 2->****************************/ 
+// class Solution {
+// public:
+//     long long continuousSubarrays(vector<int>& nums) {
+//         int n = nums.size();
+//         int i = 0, j = 0;
+//         long long count = 0;
+//         bool status;
+
+//         while (j < n) {
+//             status = true;
+//             int maxEle = *max_element(nums.begin()+i,nums.begin()+j+1);
+//             int minEle = *min_element(nums.begin()+i,nums.begin()+j+1);
+//             if(abs(maxEle - minEle) > 2){
+//                 i++;
+//                 if(i>j) j = i;
+//             }else{
+//                 count += (j-i+1);
+//                 j++;
+//             }
+            
+//         }
+//         return count;
+//     }
+// };
+//Again TLE as TIME COMPLEXITY = O(n^2)
+//Reason -> we are calculating the max_element or min_element which itself has TC => O(n)
+//TRICK -> we can use unorederd_set which will automatically arrange them in ascending order but also it NOT handle duplicates so we can use ordered map in this case.
+
+
+/******************OTPIMAL APPROACH 1(Using ordered_map)******************/
+// class Solution {
+// public:
+//     long long continuousSubarrays(vector<int>& nums) {
+//         int n = nums.size();
+//         map<int,int> mp;
+//         int i = 0, j = 0;
+//         long long count = 0;
+
+//         while (j < n) {
+//            mp[nums[j]]++;
+//            while(abs(mp.rbegin()->first - mp.begin()->first) >2){
+//                 //shrinking the window -i index
+//                 mp[nums[i]] -= 1; //removing it from map means reducing its frequency by 1
+//                 if(mp[nums[i]] == 0){
+//                     mp.erase(nums[i]);
+//                 }
+//                 i++;
+//            }
+//            count += (j-i+1);
+//            j++;
+            
+//         }
+//         return count;
+//     }       
+// };
+//Time Complexity => O(n*log(c)) //c is constant(size of map) and  time complaexity in insertion and erase in map is log(n).
+// here n==constant in operation because we are taking the numbers that are valid only(limited size of map not worst).
+//In the worst case, the map could store all distinct elements of the array, so k could be as large as n.
+//Soace complexity => we are keeping oonly valid one in map so O(constant)
+
+
+/******************OTPIMAL APPROACH 2(Using min and max Heap)******************/
+// class Solution {
+// public:
+//     #define P pair<int,int>
+
+//     long long continuousSubarrays(vector<int>& nums) {
+//         int n = nums.size();
+//         priority_queue<P, vector<P>,greater<P>> minheap; //min-heap
+//         priority_queue<P> maxheap; //max-heap
+
+//         int i = 0, j = 0;
+//         long long count = 0;
+        
+//         while(j<n){ //O(n)
+//             minheap.push({nums[j],j}); //log(n)
+//             maxheap.push({nums[j],j}); //log(n)
+
+//             while(abs(maxheap.top().first - minheap.top().first) >2 ){
+//                 i++;
+//                 while(!maxheap.empty() && maxheap.top().second < i){
+//                     maxheap.pop();
+//                 } //it means the given index is not in our current window
+//                 while(!minheap.empty() && minheap.top().second < i){
+//                     minheap.pop();
+//                 }
+//             }
+//             count += (j-i+1);
+//             j++;
+//         }
+//         return count;
+//     }
+// };
+//Time Complexity be O(nlog(n)) as we are using heap which has insertion or delteion in time complexity O(logn).
+
+/**********************BEST OPTIMAL APPROACH (USING DEQUE)*********************/
+class Solution {
+public:
+    long long continuousSubarrays(vector<int>& nums) {
+        int n = nums.size();
+        long long count = 0;
+        int i = 0, j = 0;
+        deque<int> minDeque, maxDeque;
+
+        while (j < n) {
+            while (!minDeque.empty() && nums[minDeque.back()] >= nums[j]) {
+                minDeque.pop_back();
+            }
+            while (!maxDeque.empty() && nums[maxDeque.back()] <= nums[j]) {
+                maxDeque.pop_back();
+            }
+
+            minDeque.push_back(j);
+            maxDeque.push_back(j);
+
+            while (nums[maxDeque.front()] - nums[minDeque.front()] > 2) {
+                i++;
+                if (minDeque.front() < i) minDeque.pop_front();
+                if (maxDeque.front() < i) maxDeque.pop_front();
+            }
+
+            count += (j - i + 1);
+            j++;
+        }
+
+        return count;
+    }
+};
+
+//Time complexity => O(n) and Space Complaexity => O(n)
