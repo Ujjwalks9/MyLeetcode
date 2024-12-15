@@ -1,0 +1,95 @@
+
+/*****Classical Appraoch **************************/
+class Solution {
+public:
+    double finddiff(double pass, double total){
+        return ((pass+1)/(total+1))-(pass/total);
+    }
+
+    double maxAverageRatio(vector<vector<int>>& classes, int extraStudents) {
+        int n = classes.size();
+        priority_queue<vector<double>> pq;
+        for(int i=0;i<n;++i){
+            double pass = classes[i][0];
+            double total = classes[i][1];
+            double diff = finddiff(pass,total);
+            pq.push({diff,pass,total});
+        }
+        while(extraStudents > 0){
+            auto top = pq.top();
+            pq.pop();
+
+            double diff = top[0];
+            double new_pass = (double)top[1]+1;
+            double new_total = (double)top[2]+1;
+
+            double new_diff = finddiff(new_pass,new_total);
+            pq.push({new_diff,new_pass,new_total});
+            extraStudents--;
+        }
+
+        double total_ratio;
+        while(!pq.empty()){
+            auto top = pq.top();
+            pq.pop();
+            total_ratio += top[1]/top[2];
+        }
+        return total_ratio/n;
+    }
+};
+//TRICK => here we will calculate the pass ratio diff (if added one pass student -ealier) pass ratio , the one class
+//with more diff found at top of max-heap will have large impact on its pass ratio, and hence on average pass ratio.
+//Steps to consider here =>
+// 1). Find current pass ratio of each class.
+// 2). Increase the pass and total by 1:
+//     find the class with maximum pass ratio diff
+//     update the pass ratio
+//     keep doing until all the extraStudents used
+// 3). Finally take the sum of each pass ratio divide by number of classes for average pr
+//Using Heap to find the maximum of the diff in O(1) time complexity.
+
+// TLE APPROACH =>
+
+// class Solution {
+// public:
+//     double maxAverageRatio(vector<vector<int>>& classes, int extraStudents) {
+//         int n = classes.size();
+
+//         vector<double> PR(n);
+
+//         for(int i=0;i<n;++i){
+//             double ratio = (double)classes[i][0]/(double)classes[i][1];
+//             PR[i] = ratio;
+//         }
+//         while(extraStudents--){
+//             vector<int> updatedPR(n);
+//             for(int i=0;i<n;++i){
+//                 double newRatio = (double)(classes[i][0]+1)/(double)(classes[i][1]+1);
+//                 updatedPR[i] = newRatio;
+//             }
+
+//             int bestClassIdx = 0;
+//             double bestDelta = 0.0;
+
+//             for(int i=0;i<n;++i){ //taking O(n) to find the one with maximum difference
+//                 double delta = updatedPR[i] - PR[i];
+//                 if(delta>bestDelta){
+//                     bestDelta = delta;
+//                     bestClassIdx = i;
+//                 }
+//             }
+//             PR[bestClassIdx] = bestDelta;
+//             classes[bestClassIdx][0]++;
+//             classes[bestClassIdx][1]++;
+//         }
+//         double result = 0.0;
+
+//         for(int i=0;i<n;++i){
+//             result += PR[i];
+//         }
+//         return result/n;
+
+        
+        
+//     }
+// };
