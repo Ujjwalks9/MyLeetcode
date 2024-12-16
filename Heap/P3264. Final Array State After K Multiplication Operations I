@@ -1,0 +1,43 @@
+
+/**************** My Approach ********************/
+// class Solution {
+// public:
+//     vector<int> getFinalState(vector<int>& nums, int k, int multiplier) {
+//         int min,min_index;
+//         for(int i=0;i<k;++i){
+//                 auto minIt = min_element(nums.begin(),nums.end());
+//                 min = *minIt;
+//                 min_index = distance(nums.begin(), minIt);
+//                 nums[min_index] = min*multiplier;
+//         }
+//         return nums;
+//     }
+// }; //Accepted TC => O(k*n) n= nums.size();
+/**************** Optimal Approach ********************/
+class Solution {
+public:
+    vector<int> getFinalState(vector<int>& nums, int k, int multiplier) {
+        int n = nums.size();
+        // priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>> pq; //(begin(nums),end(nums))
+        // for(int i=0;i<n;++i){ //more time complexity as this approach takes O(nlogn)
+        //     pq.push({nums[i],i});
+        // } // we can also use heapify with time complexity O(n) but this will add only elements of the nums vector only
+        //**But here we can implement the desired thing in the same way of heapify with Time complexity O(n)
+        vector<pair<int,int>> vec;
+        for(int i=0;i<n;++i){
+            vec.push_back({nums[i],i});
+        }//made the required vector and transformed it into heap
+        make_heap(begin(vec),end(vec),greater<>());//Heapify Time Complexity O(n)
+        for(int i=0;i<k;++i){
+            pop_heap(begin(vec),end(vec),greater<>()); //reduces the size of the heap by 1 and put the smallest element at end(back)
+            pair<int,int> min_ele = vec.back(); //refers to the number with min value and its corresponding index
+            vec.pop_back(); //pops the min element present at the back
+            int num = min_ele.first;
+            int idx = min_ele.second;
+            nums[idx] = num * multiplier; 
+            vec.push_back({nums[idx],idx}); //pushes the new mulitplied one into heap and arrange itself
+            push_heap(begin(vec),end(vec),greater<>()); //adds a new element to a heap and sorts the heap after the insertion
+        }
+        return nums;
+    }
+};
