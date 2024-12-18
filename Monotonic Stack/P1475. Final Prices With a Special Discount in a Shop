@@ -1,0 +1,55 @@
+/************** My Approach(Two pointers Approach) *******************************/
+// class Solution {
+// public:
+//     vector<int> finalPrices(vector<int>& prices) {
+//         int n = prices.size();
+//         vector<int> answers(n);
+//         answers[n-1] = prices[n-1];
+//         for(int i=0;i<n-1;++i){  //-------> (n-1)
+//             for(int j= i+1;j<n;++j){  //------------>(n-1) + (n-2) + (n-3) + .....
+//                 if(prices[i]>=prices[j]){
+//                     answers[i] = prices[i] - prices[j];
+//                     break;
+//                 }else{
+//                     if(j==n-1){
+//                         answers[i] = prices[i];
+//                     }
+//                 }
+//             }
+//         }
+//         return answers;
+//     }
+// };
+//Time Complexity => O(sum of n-1 natural numbers) => O(n^2)
+//Space Somplexity => O(n)
+
+//Similar to problem Next Smaller/larger element to right/left
+
+/****************** Optimal Approach(Monotonic Stack) *********************************/
+class Solution {
+public:
+    vector<int> finalPrices(vector<int>& prices) {
+        int n = prices.size();
+        vector<int> answer(begin(prices),end(prices));
+        stack<int> st;
+
+        for(int i=0; i<n ; i++){
+            while(!st.empty() && prices[i] <= prices[st.top()]){
+                answer[st.top()] -= prices[i];
+                st.pop();
+            }
+            st.push(i);
+        }
+        return answer;
+    }
+};
+//every element is selected two time , one for iteration and other while popping that element 
+//O(2*n) => O(n)
+//in monotonic stack elements are stored in a particular order either in increasing order or decreasing order
+//every monotoninc stack has while loop to create its monotonic nature,
+//monotomic stack has a single code format =>
+// for(int i=0;i<n;++i){
+//     while(//we do comparison here to create the monotonice nature of stack){
+
+//     }
+// }
