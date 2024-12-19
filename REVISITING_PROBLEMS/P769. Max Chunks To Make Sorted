@@ -1,0 +1,106 @@
+/*************** Hot listed Problem **********************/
+
+// class Solution {
+// public:
+//     int maxChunksToSorted(vector<int>& arr) {
+//         int n = arr.length();
+//         int chunk=0;
+//         vector<int> prefix_max(n);
+//         vector<int> suffix_min(n);
+//         for(int i=0;i<n;++i){
+//             prefix_max[i] = *max_element(arr.begin(),arr.begin()+i);
+//             suffix_min[n-(i+1)] = *min_element(arr.begin()+i,arr.end());
+//         }
+//         for(int i=0;i<n;++i){
+//             int prefixmax = i!=0 ? prefix_max[i-1] : -1;
+//             int suffixmin = i!=n ? suffix_min[i+1] : n+1;
+
+//             if(prefixmax < suffixmin){
+//                 chunk++;
+//             }
+//         }
+//         return chunk;
+//     }
+// };
+//Wrong Approach
+/************************** Approach 1 prefix_max and suffix_min approach *******************/
+// class Solution {
+// public:
+//     int maxChunksToSorted(vector<int>& arr) {
+//         int n = arr.size();
+//         int chunk = 0;
+//         vector<int> prefix_max(n);
+//         vector<int> suffix_min(n);
+
+//         prefix_max[0] = arr[0];
+//         for (int i = 1; i < n; ++i) {
+//             prefix_max[i] = max(prefix_max[i - 1], arr[i]);
+//         }
+
+//         suffix_min[n - 1] = arr[n - 1];
+//         for (int i = n - 2; i >= 0; --i) {
+//             suffix_min[i] = min(suffix_min[i + 1], arr[i]);
+//         }
+//         for (int i = 0; i < n - 1; ++i) {
+//             if (prefix_max[i] <= suffix_min[i + 1]) {
+//                 chunk++;
+//             }
+//         }
+//         return chunk + 1;
+//     }
+// };
+//Trick => In this problem to identify that eah number lies in separate chunk or it is in with prevoius chunk with some other element or not for this : 
+//we compare the pointing index i element with its two operative value: (iterating from 0 to n-1)
+// 1). max value from the starting to till the previous index of the i index element == max_prefix_value
+// 2). and min value in the next index to the end including that index, == min_suffix_value
+//if the condition of max_prefix_value < min_suffix_value then: we can put that index i in the separate chunk element
+//it not we can't do so and hence we put that value in the preious/last chunk
+
+/*************** Approach 2(Cumulative Sum Approach) => ***********************/
+class Solution {
+public:
+    int maxChunksToSorted(vector<int>& arr) {
+        int n = arr.size();
+        // vector<int> sorted_cumulative(n);
+        // vector<int> arr_cumulative(n);
+        // int chunk = 0;
+        // for(int i=0;i<n;++i){
+        //     (i==0) ? sorted_cumulative[i] = 0 : sorted_cumulative[i] = sorted_cumulative[i-1] +  i;
+        //     (i==0) ? arr_cumulative[i] = arr[0] : arr_cumulative[i] = arr_cumulative[i-1] + arr[i];
+        //     if(sorted_cumulative[i] == arr_cumulative[i]){
+        //         chunk++;
+        //     }
+        // }
+        int sort_cumulative_sum =0 , arr_cumulative_sum = 0, chunk =0;
+        for(int i=0;i<n;++i){
+            arr_cumulative_sum += arr[i];
+            sort_cumulative_sum += i;
+            if(arr_cumulative_sum == sort_cumulative_sum){
+                chunk++;
+            }
+        }
+        return chunk;
+    }
+};
+//NOTE => In this approach we find the cumulative sum of of sorted one and given arr , at the point they are same means
+// that element can appear as separate chunk 
+/************* Approach 3 (max_element at same index i) *******************/
+class Solution {
+public:
+    int maxChunksToSorted(vector<int>& arr) {
+        vector<int> prefix_max(n);
+        int chunk = 0;
+        prefix_max[0] = arr[0];
+        for (int i = 1; i < n; ++i) {
+            prefix_max[i] = max(prefix_max[i - 1], arr[i]);
+        }
+        for(int i=0;i<n;++i){
+            if(prefix_max[i] == i){
+                chunk++;
+            }
+        }
+        return chunk;
+    }
+};
+//Here also we compare the max_element found before the index of the given element and if it matches than it can act 
+//as a separate chunk for that given array, arr.
